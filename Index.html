@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>YouTube Thumbnail Downloader</title>
+    <style>
+      /* Base Reset + Typography */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        background: radial-gradient(circle at top left, #ff512f, #dd2476 70%);
+        color: #fff;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        scroll-behavior: smooth;
+      }
+
+      header {
+        text-align: center;
+        padding: 60px 20px 30px;
+        animation: fadeInDown 1s ease;
+      }
+      header h1 {
+        font-size: 2.7rem;
+        letter-spacing: 1px;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      }
+      header p {
+        color: #ffe1ec;
+        font-size: 1.15rem;
+        margin-top: 10px;
+      }
+
+      main {
+        width: 90%;
+        max-width: 640px;
+        margin-top: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 22px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        padding: 35px 30px;
+        animation: fadeInUp 1s ease;
+        transition: 0.3s;
+      }
+      main:hover {
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+      input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0 18px;
+        border: none;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        font-size: 1rem;
+        outline: none;
+        transition: background 0.3s;
+      }
+      input:focus {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      .btn {
+        width: 100%;
+        padding: 12px;
+        margin-top: 6px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, #ff512f, #dd2476);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        transform: scale(1.02);
+        filter: brightness(1.1);
+      }
+      .btn-download {
+        background: linear-gradient(90deg, #00ffae, #00c3ff);
+        color: #222;
+        font-weight: 800;
+        margin-top: 14px;
+      }
+      .btn-download:hover {
+        transform: scale(1.03);
+      }
+      .status {
+        margin-top: 8px;
+        text-align: center;
+        color: #ffe1ec;
+        font-size: 0.95rem;
+      }
+      .loading {
+        display: inline-block;
+        margin-left: 6px;
+        width: 16px;
+        height: 16px;
+        border: 3px solid rgba(255, 255, 255, 0.25);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .result {
+        text-align: center;
+        margin-top: 20px;
+      }
+      .result img {
+        max-width: 100%;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+        animation: fadeIn 0.6s ease;
+      }
+
+      section {
+        width: 90%;
+        max-width: 800px;
+        margin: 40px auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 22px;
+        padding: 30px;
+        text-align: justify;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        animation: fadeInUp 1.2s ease;
+      }
+      section h2 {
+        text-align: center;
+        margin-bottom: 12px;
+        font-size: 1.8rem;
+        text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+      }
+      section p {
+        line-height: 1.6;
+        color: #ffe1ec;
+        font-size: 1rem;
+      }
+      .contact {
+        text-align: center;
+      }
+      .contact a {
+        color: #00ffae;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      footer {
+        margin: 50px 0 20px;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #ffe1ec;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 2rem;
+        }
+        main {
+          padding: 25px;
+        }
+        section {
+          padding: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>🎬 YouTube Thumbnail Downloader</h1>
+      <p>
+        Download any YouTube video thumbnail in seconds — fast, free & beautiful
+      </p>
+    </header>
+
+    <main>
+      <label for="videoUrl">Enter YouTube Video URL:</label>
+      <input
+        type="text"
+        id="videoUrl"
+        placeholder="https://www.youtube.com/watch?v=VIDEO_ID"
+      />
+      <button class="btn btn-primary" id="fetchBtn">Get Thumbnail</button>
+      <div class="status" id="status"></div>
+      <div class="result" id="result"></div>
+    </main>
+
+    <section id="about">
+      <h2>About</h2>
+      <p>
+        This website allows you to instantly grab and download thumbnails from
+        any public YouTube video. Whether you’re a designer, content creator, or
+        just learning — this tool helps you fetch high-quality thumbnails
+        easily. Simply paste the video link above, click “Get Thumbnail,” and
+        download the image directly.
+      </p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <div class="contact">
+        <p>Have suggestions or issues? We'd love to hear from you!</p>
+        <p>
+          📧 Email:
+          <a href="mailto:support@thumbgrabber.com">support@thumbgrabber.com</a>
+        </p>
+        <p>🌐 Website: <a href="#">www.thumbgrabber.com</a></p>
+      </div>
+    </section>
+
+    <footer>
+      © 2025 YouTube Thumbnail Downloader | Crafted with ❤️ by Biswajit Rout
+    </footer>
+
+    <script>
+      const fetchBtn = document.getElementById("fetchBtn");
+      const statusEl = document.getElementById("status");
+      const resultEl = document.getElementById("result");
+      const inputEl = document.getElementById("videoUrl");
+
+      const sizes = [
+        "maxresdefault.jpg",
+        "sddefault.jpg",
+        "hqdefault.jpg",
+        "mqdefault.jpg",
+        "default.jpg",
+      ];
+
+      function setStatus(msg, load = false) {
+        statusEl.innerHTML =
+          msg + (load ? ' <span class="loading"></span>' : "");
+      }
+
+      function extractId(url) {
+        if (!url) return null;
+        const patterns = [
+          /v=([^&\s]+)/,
+          /youtu\.be\/([^?\s]+)/,
+          /embed\/([^?\s]+)/,
+          /v\/([^?\s]+)/,
+        ];
+        for (const p of patterns) {
+          const m = url.match(p);
+          if (m) return m[1];
+        }
+        if (/^[a-zA-Z0-9_-]{6,}$/.test(url)) return url;
+        return null;
+      }
+
+      async function findThumb(id) {
+        for (const s of sizes) {
+          const u = `https://img.youtube.com/vi/${id}/${s}`;
+          try {
+            const r = await fetch(u, { method: "HEAD" });
+            if (r.ok && (r.headers.get("content-type") || "").includes("image"))
+              return u;
+          } catch (e) {}
+        }
+        return null;
+      }
+
+      function downloadBlob(blob, filename) {
+        const link = document.createElement("a");
+        const obj = URL.createObjectURL(blob);
+        link.href = obj;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(obj), 1500);
+      }
+
+      fetchBtn.addEventListener("click", async () => {
+        resultEl.innerHTML = "";
+        const url = inputEl.value.trim();
+        const id = extractId(url);
+        if (!id) {
+          alert("Please enter a valid YouTube URL!");
+          return;
+        }
+
+        setStatus("Fetching available thumbnail...", true);
+        fetchBtn.disabled = true;
+
+        const found = await findThumb(id);
+        if (!found) {
+          setStatus("No thumbnail found.", false);
+          fetchBtn.disabled = false;
+          return;
+        }
+
+        setStatus("Thumbnail ready.", false);
+        resultEl.innerHTML = `
+        <img src="${found}" alt="Thumbnail">
+        <button class="btn btn-download" id="downloadBtn">Download Thumbnail</button>
+      `;
+
+        document
+          .getElementById("downloadBtn")
+          .addEventListener("click", async () => {
+            setStatus("Downloading...", true);
+            try {
+              const res = await fetch(found);
+              const blob = await res.blob();
+              downloadBlob(blob, `${id}.jpg`);
+              setStatus("Download started!", false);
+            } catch (e) {
+              setStatus("Download failed. Try again.", false);
+            }
+          });
+
+        fetchBtn.disabled = false;
+      });
+
+      inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") fetchBtn.click();
+      });
+    </script>
+  </body>
+</html>
